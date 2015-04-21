@@ -31,8 +31,10 @@ version="2.0">
 					<xsl:for-each select="/dblp//author[text()=$all_name]"> -->
 					<xsl:for-each select="current-group()">
 						<xsl:sort select="../year" order="descending"/> <!-- On trie les travaux par date descendante -->
+						
 						<xsl:variable name="title" select="../title"/>
 						<xsl:variable name="year" select="../year"/>
+						<xsl:variable name="url" select="../ee"/>
 						<tr><th colspan="3" bgcolor="#FFFFCC"><xsl:value-of select="$year"/></th></tr>
 						<tr>
 							<!-- The publication number (the earliest publication is
@@ -42,7 +44,7 @@ version="2.0">
 							<!-- A link to an online version of the publication whose
 							  URL is listed in the < ee > element,  if that element is present -->
 							<td valign="top">
-								<a href="">
+								<a href="{$url}">
 								  <img alt="Electronic Edition" title="Electronic Edition"
 							  src="http://www.informatik.uni-trier.de/~ley/db/ee.gif"
 							  border="0" height="16" width="16"/>
@@ -72,6 +74,8 @@ version="2.0">
 						</tr>
 					</xsl:for-each>
 				</table>
+			  
+			  	<h2> Co-author index </h2>
 		  </body>
 		</html>
 
