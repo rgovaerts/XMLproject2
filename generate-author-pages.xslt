@@ -76,6 +76,28 @@ version="2.0">
 				</table>
 			  
 			  	<h2> Co-author index </h2>
+			  		<p>
+      					<table border="1">
+      						<xsl:for-each select="../author">
+      							
+  								<xsl:variable name="last_name_i" select="tokenize(., ' ')[last()]"/>
+								<xsl:variable name="first_name_i" select="replace(., concat(' ',$last_name_i), '')"/>
+								<xsl:variable name="last_name_url_i" select="replace($last_name_i, '[^a-zA-Z0-9]', '=')" />
+								<xsl:variable name="first_name_url_i" select="replace($first_name_i, ' ', '_')" />
+								<xsl:variable name="first_name_url_i" select="replace($first_name_url_i, '[^a-zA-Z0-9-_]', '=')" />
+  								<xsl:if test="$last_name_i!=$last_name">
+		  							<tr>
+					  					<td align="right">
+					  						<!-- link to co-author page if present-->
+					  						<a href="../{substring($last_name_i,1,1)}/{$last_name_url_i}.{$first_name_url_i}.html"><xsl:value-of select="."/></a>,
+				  						</td>
+					  						<!-- link to a co-authored publications in this page -->
+					  					<td align="left"> [<a href="#p5"><xsl:value-of select="position()"/></a>] </td>
+									</tr>
+								</xsl:if>	
+							</xsl:for-each>
+						</table>
+					</p>
 		  </body>
 		</html>
 
