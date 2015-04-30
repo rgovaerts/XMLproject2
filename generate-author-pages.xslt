@@ -40,7 +40,7 @@ version="2.0">
 							<!-- The publication number (the earliest publication is
 							publication number 1, the last publication has the highest
 							number) -->
-							<td align="right" valign="top"><a name="p5"/><xsl:value-of select="position()"/></td>
+							<td align="right" valign="top"><a name="p5"/><xsl:value-of select="last()-position()+1"/></td>
 							<!-- A link to an online version of the publication whose
 							  URL is listed in the < ee > element,  if that element is present -->
 							<td valign="top">
@@ -67,7 +67,14 @@ version="2.0">
 									<xsl:variable name="last_name_url_i" select="replace($last_name_i, '[^a-zA-Z0-9]', '=')" />
 									<xsl:variable name="first_name_url_i" select="replace($first_name_i, ' ', '_')" />
 									<xsl:variable name="first_name_url_i" select="replace($first_name_url_i, '[^a-zA-Z0-9-_]', '=')" />
-									<a href="../{substring($last_name_i,1,1)}/{$last_name_url_i}.{$first_name_url_i}.html"><xsl:value-of select="."/></a>, 
+									<xsl:choose>
+										<xsl:when test="$last_name_i!=$last_name">
+											<a href="../{substring($last_name_i,1,1)}/{$last_name_url_i}.{$first_name_url_i}.html"><xsl:value-of select="."/></a>,&#160;
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="."/>,&#160;
+										</xsl:otherwise>
+									</xsl:choose>
 								</xsl:for-each>
 								: <xsl:value-of select="$title"/>&#160;<xsl:value-of select="$year"/>.
 							</td>
@@ -78,23 +85,33 @@ version="2.0">
 			  	<h2> Co-author index </h2>
 			  		<p>
       					<table border="1">
-      						<xsl:for-each select="../author">
-      							
-  								<xsl:variable name="last_name_i" select="tokenize(., ' ')[last()]"/>
-								<xsl:variable name="first_name_i" select="replace(., concat(' ',$last_name_i), '')"/>
-								<xsl:variable name="last_name_url_i" select="replace($last_name_i, '[^a-zA-Z0-9]', '=')" />
-								<xsl:variable name="first_name_url_i" select="replace($first_name_i, ' ', '_')" />
-								<xsl:variable name="first_name_url_i" select="replace($first_name_url_i, '[^a-zA-Z0-9-_]', '=')" />
-  								<xsl:if test="$last_name_i!=$last_name">
-		  							<tr>
-					  					<td align="right">
-					  						<!-- link to co-author page if present-->
-					  						<a href="../{substring($last_name_i,1,1)}/{$last_name_url_i}.{$first_name_url_i}.html"><xsl:value-of select="."/></a>,
-				  						</td>
-					  						<!-- link to a co-authored publications in this page -->
-					  					<td align="left"> [<a href="#p5"><xsl:value-of select="position()"/></a>] </td>
-									</tr>
-								</xsl:if>	
+							<xsl:for-each select="current-group()">
+								<xsl:sort select="../year" order="descending"/> <!-- On trie les travaux par date descendante -->
+								<xsl:variable name="list_index" select="last()-position()+1"/>
+								<xsl:for-each-group select="../author" group-by="text()">
+									<xsl:sort select="tokenize(., ' ')[last()]"/>
+									<xsl:variable name="last_name_i" select="tokenize(., ' ')[last()]"/>
+									<xsl:variable name="first_name_i" select="replace(., concat(' ',$last_name_i), '')"/>
+									<xsl:variable name="last_name_url_i" select="replace($last_name_i, '[^a-zA-Z0-9]', '=')" />
+									<xsl:variable name="first_name_url_i" select="replace($first_name_i, ' ', '_')" />
+									<xsl:variable name="first_name_url_i" select="replace($first_name_url_i, '[^a-zA-Z0-9-_]', '=')" />
+									
+									
+									<xsl:if test="$last_name_i!=$last_name">
+										<tr>
+											<td align="right">
+												<!-- link to co-author page if present-->
+												<a href="../{substring($last_name_i,1,1)}/{$last_name_url_i}.{$first_name_url_i}.html"><xsl:value-of select="."/></a>,
+											</td>
+												<!-- link to a co-authored publications in this page -->
+											<td align="left"> 
+												<xsl:for-each select="current-group()"><!-- One goes over all the commun publication with the co-author -->
+													[<a href="#p{$list_index}"><xsl:value-of select="$list_index"/></a>] 
+												</xsl:for-each>
+											</td>
+										</tr>
+									</xsl:if>	
+								</xsl:for-each-group>
 							</xsl:for-each>
 						</table>
 					</p>
